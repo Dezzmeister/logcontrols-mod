@@ -17,7 +17,8 @@ public class CmdLogCommand {
 
 	public static void register(final CommandDispatcher<CommandSource> dispatcher) {
 		final LiteralArgumentBuilder<CommandSource> commandSource = Commands.literal("cmdlog")
-				.then(getKnownCommandBranches(true)).then(getKnownCommandBranches(false))
+				.requires(p -> p.hasPermissionLevel(3)).then(getKnownCommandBranches(true))
+				.then(getKnownCommandBranches(false))
 				.then(Commands.literal("reset").then(Commands.argument("enableLogging", BoolArgumentType.bool())
 						.executes(context -> resetLogging(context))));
 
@@ -38,19 +39,20 @@ public class CmdLogCommand {
 
 		return root;
 	}
-	
+
 	private static final int setLoggingFor(final CommandContext<CommandSource> context, final String literal) {
 		final boolean shouldEnableLogging = BoolArgumentType.getBool(context, "enableLogging");
-		
+
 		CommandLogging.DEFAULT_LOGGING.setLogged(literal, shouldEnableLogging);
-		
+
 		return 1;
 	}
 
-	private static final int getLoggingFor(final CommandContext<CommandSource> context, final String commandLiteral) throws CommandSyntaxException {
+	private static final int getLoggingFor(final CommandContext<CommandSource> context, final String commandLiteral)
+			throws CommandSyntaxException {
 		final boolean isLogged = CommandLogging.DEFAULT_LOGGING.isLogged(commandLiteral);
 		final ServerPlayerEntity source = context.getSource().asPlayer();
-		
+
 		source.sendMessage(new StringTextComponent(isLogged + ""), Util.field_240973_b_);
 
 		return 1;
